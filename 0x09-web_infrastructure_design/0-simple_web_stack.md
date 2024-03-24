@@ -1,3 +1,4 @@
+![simple webstack](https://github.com/Amele06/alx-system_engineering-devops/assets/137955229/621af620-64f1-4341-a94b-7218ea2b3f9a)
 Specifics of the Infrastructure:
 
 Server: A server is a physical or virtual machine that provides resources, services, or data to other computers or users over a network.
