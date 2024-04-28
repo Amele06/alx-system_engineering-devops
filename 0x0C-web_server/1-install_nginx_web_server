@@ -1,39 +1,28 @@
 #!/usr/bin/env bash
-# Configures a new ubuntu machine by installing
-# Nginx where it should be listening on port 80
-# Serve a page that would return a Hello World string
-#
+# Installs Nginx with the following configurations:
+#+    Listens on port 80.
+#+    Returns a page containing "Hello World!" when queried
+#++    at the root with a curl GET request.
 
-# Error handling function
-handle_error() {
-    echo "Error occurred on line $1"
-    exit 1
+#  updates the package lists for available software packages.
+apt-get update
+# installs the Nginx web server.
+apt-get install -y nginx
+
+# Creates the /etc/nginx/html directory, which will serve as the document root directory for Nginx.
+mkdir /etc/nginx/html
+#  creates an empty index.html file inside the /etc/nginx/html directory.
+touch /etc/nginx/html/index.html
+#  sets the content of the index.html file to "Hello World!" using the echo command.
+echo "Hello World!" > /etc/nginx/html/index.html
+# Sets Nginx to listen on port 80 and serve files from the /etc/nginx/html directory.
+printf %s "server {
+     listen      80;
+     listen      [::]:80 default_server;
+     root        /etc/nginx/html;
+     index       index.html index.htm;
 }
+" > /etc/nginx/sites-available/default
 
-trap 'handle_error $LINENO' ERR
-
-echo -e "Updating and installing Nginx.\n"
-# Check if Nginx is already installed
-if ! command -v nginx &> /dev/null; then
-    sudo apt-get update -y -qq
-    sudo apt-get install nginx -y
-fi
-
-echo -e "\nSetting up some minor stuff.\n"
-
-# Set ownership and permissions for the web directory
-sudo chown -R "$USER":"$USER" /var/www/html
-sudo chmod -R 755 /var/www/html
-
-# Backup default index if it exists
-if [[ -f /var/www/html/index.nginx-debian.html ]]; then
-    cp /var/www/html/index.nginx-debian.html /var/www/html/index.nginx-debian.html.bckp
-fi
-
-# Creating new index
-echo -e "Hello World!" | sudo tee /var/www/html/index.nginx-debian.html >/dev/null
-
-# Restarting nginx
-sudo service nginx restart
-
-echo -e "\nCompleted. ✅\n"
+# Restarts the Nginx service to apply the configuration changes.
+service nginx restart
