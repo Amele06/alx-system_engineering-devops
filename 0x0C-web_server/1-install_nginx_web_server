@@ -1,30 +1,39 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# Configures a new ubuntu machine by installing
+# Nginx where it should be listening on port 80
+# Serve a page that would return a Hello World string
+#
 
-# Install nginx with the -y flag to avoid manual confirmation during installation
-apt-get update
-apt-get install -y nginx
+# Error handling function
+handle_error() {
+    echo "Error occurred on line $1"
+    exit 1
+}
 
-# Ensure nginx is listening on port 80
-sed -i 's/80 default_server/80 default_server;/g' /etc/nginx/sites-available/default
+trap 'handle_error $LINENO' ERR
 
-# Restart nginx without using systemctl
-/etc/init.d/nginx restart || service nginx restart
-
-# Check if nginx is running
-if pgrep -x "nginx" > /dev/null
-then
-    echo "Nginx is running."
-else
-    echo "Nginx is not running."
+echo -e "Updating and installing Nginx.\n"
+# Check if Nginx is already installed
+if ! command -v nginx &> /dev/null; then
+    sudo apt-get update -y -qq
+    sudo apt-get install nginx -y
 fi
 
-# Create a temporary index.html file with "Hello World!" content
-echo "Hello World!" > /var/www/html/index.html
+echo -e "\nSetting up some minor stuff.\n"
 
-# Test nginx configuration
-curl -s localhost | grep "Hello World!" > /dev/null
-if [ $? -eq 0 ]; then
-    echo "Nginx configured successfully."
-else
-    echo "Nginx configuration failed."
+# Set ownership and permissions for the web directory
+sudo chown -R "$USER":"$USER" /var/www/html
+sudo chmod -R 755 /var/www/html
+
+# Backup default index if it exists
+if [[ -f /var/www/html/index.nginx-debian.html ]]; then
+    cp /var/www/html/index.nginx-debian.html /var/www/html/index.nginx-debian.html.bckp
 fi
+
+# Creating new index
+echo -e "Hello World!" | sudo tee /var/www/html/index.nginx-debian.html >/dev/null
+
+# Restarting nginx
+sudo service nginx restart
+
+echo -e "\nCompleted. ✅\n"
