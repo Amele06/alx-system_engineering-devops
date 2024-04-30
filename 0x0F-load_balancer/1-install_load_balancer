@@ -36,12 +36,12 @@ defaults
 
 frontend drkel-tech-frontend
     bind *:80
-    default_backend clickviral-tech-backend
+    default_backend drkel-tech-backend
 
 backend drkel-tech-backend
     balance roundrobin
-    server 151666-web-01 100.27.5.80 check
-    server 151666-web-02 100.26.255.157 check
+    server 474652-web-01 100.27.5.80:80 check
+    server 474652-web-02 100.26.255.157:80 check
 "
 
 # shellcheck disable=SC2154
