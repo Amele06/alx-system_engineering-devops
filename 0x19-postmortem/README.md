@@ -1,53 +1,39 @@
-#0x19-postmortem task using webstack debugging #1
-
+#Postmortem for Webstack Debugging Task #1
 
 # Issue Summary
-Duration of the Outage: The outage started at 09:45 AM and was resolved by 16:15 PM West African Time.
-
-# Impact
-The site was not listening on port 80, causing all users to be unable to access the website.
-
-# Root Cause:
-The Nginx server's site settings were not properly linked. Specifically, the sites-available configuration was not linked to sites-enabled, meaning the configuration was correct but not activated, preventing users from accessing the site.
+* Outage Duration: 09:45 AM to 16:15 PM West African Time
+# Impact: The website was inaccessible due to Nginx not listening on port 80, preventing all users from accessing the site.
+# Root Cause
+* The root cause of the outage was an incomplete Nginx configuration. The configuration file in sites-available was not properly linked to sites-enabled, causing the correct configuration to remain inactive despite no syntax errors in the Nginx files.
 
 # Timeline
-09:45 AM: The issue was detected when ALX (the platform) attempted to access the website and found it unresponsive.
-
-10:50 AM: ALX monitoring alerts indicated that the site was down, and the issue was escalated to me.
-
-11:55 AM: Initial investigation focused on checking the Nginx configuration files for errors, but no errors were found in the configuration itself.
-
-12:15 PM: Further investigation led to checking which service was listening on port 80. It was then discovered that the Nginx configuration in sites-available was not linked to sites-enabled.
-
-14:30 PM: The default configuration was correctly linked in sites-enabled, and Nginx was restarted to apply the changes.
-
-16:15 PM: The issue was resolved, and the site was back online.
-
+* 09:45 AM: ALX platform detected the website was unresponsive.
+* 10:50 AM: Monitoring alerts confirmed that the site was down and escalated the issue.
+* 11:55 AM: Initial investigation began, focusing on Nginx configuration files. No issues were detected in the configuration syntax.
+* 12:15 PM: Upon further investigation, it was discovered that the Nginx service was not listening on port 80 due to the missing symbolic link between sites-available and sites-enabled.
+* 14:30 PM: The configuration was correctly linked, and the Nginx service was restarted to activate the changes.
+* 16:15 PM: The site was fully restored and functioning properly.
 # Root Cause and Resolution
-# Root Cause:
-The root cause was the failure to link the sites-available configuration to sites-enabled, meaning the Nginx server configuration was not active despite being correct.
+#Root Cause: Nginx configuration files were not properly activated because sites-available was not linked to sites-enabled.
 
-# Resolution:
-The issue was resolved by linking the default configuration from sites-available to sites-enabled and restarting the Nginx service.
+# Resolution: The Nginx default configuration from sites-available was linked to sites-enabled, and the Nginx service was restarted to apply the changes.
 
 # Corrective and Preventative Measures
+# Improvements
+* Implement an automated script or process to verify that the correct configuration is active after any changes.
+* Enhance monitoring systems to detect issues with Nginx earlier, specifically checking if the service is listening on the correct port (80).
 
-# Improvements:
-Ensuring that after any configuration changes, a script or automated check is run to confirm that the necessary configurations are linked and active.
-Improve the monitoring system to detect such issues earlier.
-
-# Task List:
-
-Create and execute a script to link the sites-available configuration to sites-enabled after each configuration change.
-Add a monitoring check to ensure that Nginx is correctly listening on port 80.
+# Task List
+ Create and implement a script to automatically link the configuration in sites-available to sites-enabled after every configuration change.
+ Add a monitoring check to ensure that Nginx is properly listening on port 80.
 
 # Example Script
-Here is the script i mentioned to ensure the configuration is always active:
+This script ensures that Nginx is properly configured and restarts the service to apply changes:
 
-[bash](Copy code)#!/usr/bin/env bash
+#!/usr/bin/env bash
 # Ensure Nginx is properly configured and listening on port 80
 
 cat /etc/nginx/sites-available/default > /etc/nginx/sites-enabled/default
 sudo service nginx restart
 
-# This script ensures that the correct configuration is enabled and restarts Nginx to apply the changes.
+This will ensure that the proper configuration is always enabled and that Nginx is restarted to apply changes
