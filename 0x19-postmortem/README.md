@@ -1,5 +1,7 @@
 #Postmortem for Webstack Debugging Task #1
 
+![image](https://github.com/user-attachments/assets/38d6ef0d-bc0a-44a4-8c30-1cdf552c75fa)
+
 # Issue Summary
 * Outage Duration: 09:45 AM to 16:15 PM West African Time
 # Impact: The website was inaccessible due to Nginx not listening on port 80, preventing all users from accessing the site.
